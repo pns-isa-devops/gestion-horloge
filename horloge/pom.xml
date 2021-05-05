@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>fr.unice.polytech.isa.teamq</groupId>
+    <artifactId>castexski-20-21-TEAM-Q</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <properties>
+    <versions.openjpa>2.4.1</versions.openjpa>
+  </properties>
+
+  <groupId>fr.unice.polytech.isa.teamq</groupId>
+  <artifactId>horloge</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>ejb</packaging>
+
+
+
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.unice.polytech.isa.teamq</groupId>
+      <artifactId>entities</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>fr.unice.polytech.isa.teamq</groupId>
+      <artifactId>posteDeControle</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>snapshots</id>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>snapshots</id>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>central</id>
+      <name>622e43bc2d3a-releases</name>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>622e43bc2d3a-snapshots</name>
+      <url>http://vmpx17.polytech.unice.fr:8002/artifactory/teamq-repository</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    <finalName>horloge</finalName>
+    <defaultGoal>package</defaultGoal>
+    <plugins>
+      <!--
+      <plugin>
+          <groupId>org.apache.openjpa</groupId>
+          <artifactId>openjpa-maven-plugin</artifactId>
+          <version>${versions.openjpa}</version>
+          <configuration>
+              <includes>**/entities/*.class</includes>
+              <addDefaultConstructor>true</addDefaultConstructor>
+              <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
+          </configuration>
+          <executions>
+              <execution>
+                  <id>enhancer</id>
+                  <phase>process-classes</phase>
+                  <goals>
+                      <goal>enhance</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${versions.maven.surefire}</version>
+        <configuration>
+          <forkMode>always</forkMode>
+          <!-- otherwise openejb embedded and tomee embedded shares the same context and EJBContainer is broken -->
+          <reuseForks>false</reuseForks>
+          <skipTests>true</skipTests>
+          <!-- <excludes>
+              <exclude>**/PaymentIntegrationTest.java</exclude>
+              <exclude>features/*</exclude>
+          </excludes> -->
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <phase>integration-test</phase>
+            <configuration>
+              <excludes>
+                <exclude>**/*Test.java</exclude>
+              </excludes>
+              <!--<includes>
+                  <include>**/PaymentIntegrationTest.java</include>
+              </includes>-->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <configuration>
+          <ejbVersion>3.0</ejbVersion>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${versions.maven.compiler}</version>
+        <configuration>
+          <source>${versions.java}</source>
+          <target>${versions.java}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.tomee.maven</groupId>
+        <artifactId>tomee-maven-plugin</artifactId>
+        <version>${versions.tomee}</version>
+        <configuration>
+          <!-- From TomEE to TomEE+ to support the web services stack -->
+          <tomeeClassifier>plus</tomeeClassifier>
+          <args>-Xmx512m -XX:PermSize=256m</args>
+          <deployOpenEjbApplication>true</deployOpenEjbApplication>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
